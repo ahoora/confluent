@@ -15,22 +15,21 @@ spring:
                   serde: org.apache.kafka.common.serialization.Serdes$StringSerde
                 value:
                   serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              record:
+                value:
+                  serde: org.apache.kafka.commmon.serialization.Serdes$IntegerSerde
 #      client-id: akfak
 
-#spring.cloud.stream.bindings.output.contentType: application/json
-#spring.cloud.stream.kafka.streams.binder.configuration.commit.interval.ms: 1000
-#spring.cloud.stream.kafka.streams:
-#  binder.configuration:
-#    key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-#    value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-#  bindings.output.producer:
-#    keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
-#    valueSerde: org.apache.kafka.common.serialization.Serdes$StringSerde
 
-spring.cloud.stream.bindings.input:
-  destination: akfak
-  consumer:
-    headerMode: raw
+spring.cloud.stream.bindings:
+  input:
+    destination: akfak
+    consumer:
+      headerMode: raw
+  record:
+    destionation: record
+    consumer:
+      headerMode: raw
 spring.cloud.stream.kafka.streams.binder:
   brokers: localhost:9093
 

@@ -35,7 +35,7 @@ public class KafkaController {
     public int counter = 0;
 
     @Autowired
-    private KafkaTemplate<String, String> template;
+    private KafkaTemplate<String, String> stringTemplate;
 
     @Autowired
     private QueryableStoreRegistry queryableStoreRegistry;
@@ -58,10 +58,10 @@ public class KafkaController {
     @PostMapping("gen")
     public void gen(@RequestParam int count) {
         IntStream.range(0, count)
-                 .forEach(i -> template.send("akfak", "" + i, Instant.now().toString()));
+                 .forEach(i -> stringTemplate.send("akfak", "" + i, Instant.now().toString()));
     }
 
-    @KafkaListener(topics = "akfak")
+    @KafkaListener(topics = "record", containerFactory = "recordListenerFactory")
     public void listen(ConsumerRecord<?, ?> cr) throws Exception {
         logger.info("CR: " + cr.key() + " " + cr.value());
     }
