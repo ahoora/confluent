@@ -1,12 +1,9 @@
-package akfak;
+package akfak.messaging;
 
-import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
@@ -14,7 +11,6 @@ import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class ComplexProducerConfig {
+public class MessengerConfig {
 
     @Autowired
     private KafkaProperties properties;
@@ -112,7 +108,7 @@ public class ComplexProducerConfig {
     }
 
     @Bean
-    public KafkaListenerContainerFactory kafkaListenerContainerFactory() {
+    public KafkaListenerContainerFactory stringListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
         factory.setConsumerFactory(stringConsumerFactory());
         return factory;
@@ -123,5 +119,11 @@ public class ComplexProducerConfig {
         ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
         factory.setConsumerFactory(avroConsumerFactory());
         return factory;
+    }
+
+    // This bean is required to satisfy Kafka's auto-configuration
+    @Bean
+    public KafkaListenerContainerFactory kafkaListenerContainerFactory() {
+        return stringListenerContainerFactory();
     }
 }
