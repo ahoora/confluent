@@ -28,10 +28,17 @@ public class KafkaController {
     @Autowired
     private QueryableStoreRegistry queryableStoreRegistry;
 
-    @StreamListener("input")
-    public void process(KStream<String, String> input) {
-        input.groupByKey()
-             .reduce((o, n) -> n, Materialized.as("all-data"));
+//    @StreamListener("input")
+//    public void process(KStream<String, String> input) {
+//        input.groupByKey()
+//             .reduce((o, n) -> n, Materialized.as("all-data"));
+//    }
+
+    @StreamListener
+    public void processInts(@Input("intStream") KStream<String, Integer> intStream,
+                            @Input("stringStream") KStream<String, String> stringStream) {
+        intStream.peek((k, v) -> logger.info("int: " + k + " " + v));
+        stringStream.peek((k, v) -> logger.info("input: " + k + " " + v));
     }
 
     @GetMapping("/table")
@@ -44,8 +51,11 @@ public class KafkaController {
     }
 
     interface KafkaStreamsProcessorX {
-        @Input("input")
-        KStream<?, ?> input();
+        @Input("stringStream")
+        KStream<?, ?> stringStream();
+
+        @Input("intStream")
+        KStream<?, ?> intStream();
     }
 
 }

@@ -4,34 +4,38 @@ spring:
       group-id: foo
       auto-offset-reset: earliest
     bootstrap-servers: localhost:9093
-  cloud:
-    stream:
-      kafka:
-        streams:
-          binder:
-            configuration:
-              default:
-                key:
-                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-                value:
-                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-              record:
-                value:
-                  serde: org.apache.kafka.commmon.serialization.Serdes$IntegerSerde
 #      client-id: akfak
 
-
-spring.cloud.stream.bindings:
-  input:
-    destination: akfak
-    consumer:
-      headerMode: raw
-  record:
-    destination: record
-    consumer:
-      headerMode: raw
-spring.cloud.stream.kafka.streams.binder:
-  brokers: localhost:9093
+spring.cloud.stream:
+  bindings:
+    stringStream:
+      destination: string
+      consumer:
+        headerMode: raw
+        useNativeDecoding: true
+    avro:
+      destination: avro
+      consumer:
+        headerMode: raw
+        useNativeDecoding: true
+    intStream:
+      destination: int
+      consumer:
+        headerMode: raw
+        useNativeDecoding: true
+  kafka:
+    streams:
+      binder:
+        brokers: localhost:9093
+        configuration:
+          default:
+            key:
+              serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+            value:
+              serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+      bindings:
+        intStream:
+          consumer.valueSerde: org.apache.kafka.common.serialization.Serdes$IntegerSerde
 
 server:
   port: 8080
