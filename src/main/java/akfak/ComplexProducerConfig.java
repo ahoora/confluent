@@ -1,5 +1,12 @@
 package akfak;
 
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
+import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
@@ -21,9 +28,6 @@ import java.util.Map;
 @Configuration
 public class ComplexProducerConfig {
 
-//    @Value("${spring.kafka.bootstrap-servers}")
-//    private String bootstrapServers;
-
     @Autowired
     private KafkaProperties properties;
 
@@ -37,6 +41,7 @@ public class ComplexProducerConfig {
     private Map<String, Object> commonConsumer() {
         Map<String, Object> props = common();
         props.put(ConsumerConfig.GROUP_ID_CONFIG, properties.getConsumer().getGroupId());
+        props.put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
         return props;
     }
 
@@ -55,6 +60,14 @@ public class ComplexProducerConfig {
     }
 
     @Bean
+    public ProducerFactory<String, Object> producerFactoryForAvro() {
+        Map<String, Object> props = common();
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
+        props.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
+        return new DefaultKafkaProducerFactory<>(props);
+    }
+
+    @Bean
     public KafkaTemplate<String, Integer> kafkaTemplateForIntegers() {
         return new KafkaTemplate<>(producerFactoryForIntegers());
     }
@@ -65,19 +78,30 @@ public class ComplexProducerConfig {
     }
 
     @Bean
+    public KafkaTemplate<String, Object> kafkaTemplateForAvro() {
+        return new KafkaTemplate<>(producerFactoryForAvro());
+    }
+
+    @Bean
     public ConsumerFactory<String, String> stringConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(commonConsumer(), new StringDeserializer(), new StringDeserializer());
     }
 
     @Bean
-    public ConsumerFactory<String, Integer> recordConsumerFactory() {
+    public ConsumerFactory<String, Integer> intConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(commonConsumer(), new StringDeserializer(), new IntegerDeserializer());
     }
 
     @Bean
-    public KafkaListenerContainerFactory recordListenerFactory() {
+    public ConsumerFactory<String, Object> avroConsumerFactory(SchemaRegistryClient client) {
+        KafkaAvroDeserializer des = new KafkaAvroDeserializer(client, commonConsumer());
+        return new DefaultKafkaConsumerFactory<>(commonConsumer(), new StringDeserializer(), des);
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory intListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
-        factory.setConsumerFactory(recordConsumerFactory());
+        factory.setConsumerFactory(intConsumerFactory());
         return factory;
     }
 
@@ -85,6 +109,13 @@ public class ComplexProducerConfig {
     public KafkaListenerContainerFactory kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
         factory.setConsumerFactory(stringConsumerFactory());
+        return factory;
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory avroListenerContainerFactory(SchemaRegistryClient client) {
+        ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
+        factory.setConsumerFactory(avroConsumerFactory(client));
         return factory;
     }
 }

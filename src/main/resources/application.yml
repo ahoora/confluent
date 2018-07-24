@@ -27,7 +27,7 @@ spring.cloud.stream.bindings:
     consumer:
       headerMode: raw
   record:
-    destionation: record
+    destination: record
     consumer:
       headerMode: raw
 spring.cloud.stream.kafka.streams.binder:

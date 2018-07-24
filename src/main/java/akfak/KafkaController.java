@@ -61,7 +61,7 @@ public class KafkaController {
                  .forEach(i -> stringTemplate.send("akfak", "" + i, Instant.now().toString()));
     }
 
-    @KafkaListener(topics = "record", containerFactory = "recordListenerFactory")
+    @KafkaListener(topics = "record", containerFactory = "avroListenerContainerFactory")
     public void listen(ConsumerRecord<?, ?> cr) throws Exception {
         logger.info("CR: " + cr.key() + " " + cr.value());
     }
