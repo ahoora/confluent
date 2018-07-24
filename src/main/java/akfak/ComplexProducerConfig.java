@@ -41,6 +41,7 @@ public class ComplexProducerConfig {
     private Map<String, Object> commonConsumer() {
         Map<String, Object> props = common();
         props.put(ConsumerConfig.GROUP_ID_CONFIG, properties.getConsumer().getGroupId());
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
         return props;
     }
@@ -84,18 +85,23 @@ public class ComplexProducerConfig {
 
     @Bean
     public ConsumerFactory<String, String> stringConsumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(commonConsumer(), new StringDeserializer(), new StringDeserializer());
+        Map<String, Object> props = commonConsumer();
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
     public ConsumerFactory<String, Integer> intConsumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(commonConsumer(), new StringDeserializer(), new IntegerDeserializer());
+        Map<String, Object> props = commonConsumer();
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
+        return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConsumerFactory<String, Object> avroConsumerFactory(SchemaRegistryClient client) {
-        KafkaAvroDeserializer des = new KafkaAvroDeserializer(client, commonConsumer());
-        return new DefaultKafkaConsumerFactory<>(commonConsumer(), new StringDeserializer(), des);
+    public ConsumerFactory<String, Object> avroConsumerFactory() {
+        Map<String, Object> props = commonConsumer();
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class);
+        return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
@@ -113,9 +119,9 @@ public class ComplexProducerConfig {
     }
 
     @Bean
-    public KafkaListenerContainerFactory avroListenerContainerFactory(SchemaRegistryClient client) {
+    public KafkaListenerContainerFactory avroListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
-        factory.setConsumerFactory(avroConsumerFactory(client));
+        factory.setConsumerFactory(avroConsumerFactory());
         return factory;
     }
 }
