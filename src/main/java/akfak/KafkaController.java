@@ -1,5 +1,7 @@
 package akfak;
 
+import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
@@ -11,6 +13,7 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.binder.kafka.streams.QueryableStoreRegistry;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,9 +39,11 @@ public class KafkaController {
 
     @StreamListener
     public void processInts(@Input("intStream") KStream<String, Integer> intStream,
-                            @Input("stringStream") KStream<String, String> stringStream) {
+                            @Input("stringStream") KStream<String, String> stringStream,
+                            @Input("avroStream") KStream<String, Object> avroStream) {
         intStream.peek((k, v) -> logger.info("int: " + k + " " + v));
         stringStream.peek((k, v) -> logger.info("input: " + k + " " + v));
+        avroStream.peek((k, v) -> logger.info("avro: " + k + " " + v));
     }
 
     @GetMapping("/table")
@@ -56,6 +61,9 @@ public class KafkaController {
 
         @Input("intStream")
         KStream<?, ?> intStream();
+
+        @Input("avroStream")
+        KStream<?, ?> avroStream();
     }
 
 }

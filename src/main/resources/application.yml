@@ -13,7 +13,7 @@ spring.cloud.stream:
       consumer:
         headerMode: raw
         useNativeDecoding: true
-    avro:
+    avroStream:
       destination: avro
       consumer:
         headerMode: raw
@@ -28,6 +28,7 @@ spring.cloud.stream:
       binder:
         brokers: localhost:9093
         configuration:
+          schema.registry.url: http://localhost:8081
           default:
             key:
               serde: org.apache.kafka.common.serialization.Serdes$StringSerde
@@ -36,6 +37,8 @@ spring.cloud.stream:
       bindings:
         intStream:
           consumer.valueSerde: org.apache.kafka.common.serialization.Serdes$IntegerSerde
+        avroStream:
+          consumer.valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
 
 server:
   port: 8080
