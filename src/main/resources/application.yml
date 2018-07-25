@@ -38,7 +38,13 @@ spring.cloud.stream:
         intStream:
           consumer.valueSerde: org.apache.kafka.common.serialization.Serdes$IntegerSerde
         avroStream:
-          consumer.valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
+          consumer:
+            valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
+            useNativeEncoding: true
+          producer:
+            valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
+            useNativeEncoding: true
+
 
 server:
   port: 8080
