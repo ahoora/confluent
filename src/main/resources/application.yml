@@ -1,10 +1,10 @@
 spring:
   kafka:
     consumer:
-      group-id: foo
+      group-id: prozess
       auto-offset-reset: earliest
     bootstrap-servers: localhost:9093
-#      client-id: akfak
+#      client-id: prozess
 
 spring.cloud.stream:
   bindings:

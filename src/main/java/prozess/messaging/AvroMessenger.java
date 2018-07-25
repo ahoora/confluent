@@ -1,4 +1,4 @@
-package akfak.messaging;
+package prozess.messaging;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
