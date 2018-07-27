@@ -19,6 +19,7 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.binder.kafka.streams.QueryableStoreRegistry;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,6 +32,7 @@ import java.util.stream.StreamSupport;
 
 @RestController
 @EnableBinding(KafkaController.KafkaStreamsProcessorX.class)
+@Profile("kafka")
 public class KafkaController {
 
     public static Logger logger = LoggerFactory.getLogger(KafkaController.class);

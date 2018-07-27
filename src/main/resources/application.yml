@@ -23,6 +23,16 @@ spring.cloud.stream:
       consumer:
         headerMode: raw
         useNativeDecoding: true
+    request:
+      destination: request
+      consumer:
+        headerMode: raw
+        useNativeDecoding: true
+    validate:
+      destination: validate
+      consumer:
+        headerMode: raw
+        useNativeDecoding: true
   kafka:
     streams:
       binder:

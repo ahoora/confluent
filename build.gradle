@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-webflux'
     compile 'org.springframework.cloud:spring-cloud-stream-binder-kafka-streams'
     compile 'io.confluent:kafka-avro-serializer:3.3.1'
     compile 'io.confluent:kafka-streams-avro-serde:3.3.1'
