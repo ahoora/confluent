@@ -10,11 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.util.stream.IntStream;
@@ -32,11 +31,11 @@ public class AvroMessenger {
     private KafkaTemplate<String, Object> template;
 
     @PostMapping("gen")
-    public void gen(@RequestParam int count) throws IOException {
+    public void gen(@Valid @RequestBody GenerateRequest request) throws IOException {
         Schema schema = new Schema.Parser().parse(new File("user.avsc"));
         GenericRecord r = new GenericData.Record(schema);
         r.put("name", "me");
-        IntStream.range(0, count)
+        IntStream.range(0, request.count)
                  .forEach(i -> {
                      r.put("number", i);
                      template.send(topic, "" + i, r);

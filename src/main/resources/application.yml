@@ -24,11 +24,13 @@ spring.cloud.stream:
         headerMode: raw
         useNativeDecoding: true
     request:
+      group: requestConsumer
       destination: request
       consumer:
         headerMode: raw
         useNativeDecoding: true
     validate:
+      group: validateConsumer
       destination: validate
       consumer:
         headerMode: raw

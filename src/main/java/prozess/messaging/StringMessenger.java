@@ -7,11 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.Instant;
 import java.util.stream.IntStream;
 
@@ -28,8 +26,8 @@ public class StringMessenger {
     private KafkaTemplate<String, String> template;
 
     @PostMapping("gen")
-    public void gen(@RequestParam int count) {
-        IntStream.range(0, count)
+    public void gen(@Valid @RequestBody GenerateRequest request) {
+        IntStream.range(0, request.count)
                  .forEach(i -> template.send(topic, "" + i, Instant.now().toString()));
     }
 
