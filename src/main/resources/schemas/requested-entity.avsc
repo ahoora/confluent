@@ -1,0 +1,9 @@
+{
+  "namespace": "prozess",
+  "type": "record",
+  "name": "RequestedEntity",
+  "fields": [
+    {"name": "entity", "type": "Entity"},
+    {"name": "requestor", "type": "string"}
+  ]
+}

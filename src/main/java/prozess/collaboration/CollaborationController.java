@@ -1,5 +1,9 @@
 package prozess.collaboration;
 
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericEnumSymbol;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.KStream;
 import org.slf4j.Logger;
@@ -8,8 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import prozess.messaging.MessengerConfig;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -21,19 +30,26 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/collab")
 @EnableBinding(StreamBindings.class)
+@Import(MessengerConfig.class)
 public class CollaborationController {
 
     private static final Logger logger = LoggerFactory.getLogger(CollaborationController.class);
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
-    private Flux<KeyValue<UUID, String>> completedRequests;
+    @Autowired
+    private Schema entityRequestSchema;
+
+    @Autowired
+    private Schema entitySchema;
+
+    private Flux<KeyValue<UUID, GenericRecord>> completedRequests;
 
     @StreamListener
-    public void process(@Input("validate") KStream<String, String> validations) {
+    public void process(@Input("validate") KStream<String, GenericRecord> validations) {
         EmitterProcessor emitter = EmitterProcessor.<KeyValue<UUID, String>>create();
-        FluxSink<KeyValue<UUID, String>> sink = emitter.sink();
+        FluxSink<KeyValue<UUID, GenericRecord>> sink = emitter.sink();
         completedRequests = emitter.publish().autoConnect();
 
         validations.peek((k, v) -> {
@@ -42,20 +58,28 @@ public class CollaborationController {
         });
     }
 
-    @PostMapping("/request")
-    public Mono<String> request(@Valid @RequestBody Request request) {
+    @PostMapping("/entity")
+    public Mono<String> createEntity(@Valid @RequestBody CreateEntityRequest request) {
         UUID uuid = UUID.randomUUID();
 
-        Mono<String> ret = completedRequests.filter(u -> uuid.equals(uuid))
+        Mono<String> ret = completedRequests.filter(u -> uuid.equals(u.key))
                                             .map(kv -> {
-                                                if (!kv.value.equals("ok")) {
+                                                GenericEnumSymbol result = (GenericEnumSymbol) kv.value.get("validationResult");
+                                                if (!"OK".equals(result.toString())) {
                                                     throw new RuntimeException("Validation error");
                                                 }
                                                 return kv;
                                             })
-                                            .map(kv -> kv.key.toString())
+                                            .map(kv -> kv.toString())
                                             .next();
-        kafkaTemplate.send("request", uuid.toString(), request.message);
+
+        logger.info(entityRequestSchema.toString(true));
+        GenericRecord entityRequestRecord = new GenericData.Record(entityRequestSchema);
+        GenericRecord entity = new GenericData.Record(entitySchema);
+        entity.put("name", request.name);
+        entityRequestRecord.put("entity", entity);
+        entityRequestRecord.put("requestor", "someone");
+        kafkaTemplate.send("request", uuid.toString(), entityRequestRecord);
         return ret;
     }
 }

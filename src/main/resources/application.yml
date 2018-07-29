@@ -56,6 +56,17 @@ spring.cloud.stream:
           producer:
             valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
             useNativeEncoding: true
+        request:
+          consumer:
+            valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
+            useNativeEncoding: true
+        validate:
+          consumer:
+            valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
+            useNativeEncoding: true
+          producer:
+            valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
+            useNativeEncoding: true
 
 
 server:

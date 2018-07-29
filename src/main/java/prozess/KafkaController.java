@@ -40,16 +40,8 @@ public class KafkaController {
     @Autowired
     private QueryableStoreRegistry queryableStoreRegistry;
 
-    @Value("${spring.cloud.stream.kafka.streams.binder.configuration.schema.registry.url}")
-    private String schemaRegistryUrl;
-
-    private GenericAvroSerde avroSerde() {
-        Map<String, Object> serdeConfig = new HashMap<>();
-        serdeConfig.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
-        GenericAvroSerde avroSerde = new GenericAvroSerde();
-        avroSerde.configure(serdeConfig, false);
-        return avroSerde;
-    }
+    @Autowired
+    private GenericAvroSerde avroSerde;
 
     private String textDump(ReadOnlyKeyValueStore<?, ?> store) {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(store.all(), Spliterator.ORDERED), false)
@@ -71,12 +63,11 @@ public class KafkaController {
                     .groupByKey()
                     .reduce((oldValue, newValue) -> newValue, Materialized.as("string-t"));
 
-        final GenericAvroSerde serde = avroSerde();
         avroStream.peek((k, v) -> logger.info("avro: " + k + " " + v + " " + v.getClass().getName()))
-                  .groupByKey(Serialized.with(Serdes.String(), serde))
+                  .groupByKey(Serialized.with(Serdes.String(), avroSerde))
                   .reduce((oldValue, newValue) -> newValue,
                           Materialized.<String, GenericRecord, KeyValueStore<Bytes, byte[]>>as("avro-t")
-                                      .withValueSerde(serde));
+                                      .withValueSerde(avroSerde));
     }
 
     @GetMapping("/string/table")
