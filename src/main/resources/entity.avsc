@@ -1,8 +1,0 @@
-{
-  "namespace": "prozess.model",
-  "type": "record",
-  "name": "Entity",
-  "fields": [
-    {"name": "name", "type": "string"}
-  ]
-}

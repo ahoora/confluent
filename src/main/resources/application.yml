@@ -4,25 +4,9 @@ spring:
       group-id: prozess
       auto-offset-reset: earliest
     bootstrap-servers: localhost:9093
-#      client-id: prozess
 
 spring.cloud.stream:
   bindings:
-    stringStream:
-      destination: string
-      consumer:
-        headerMode: raw
-        useNativeDecoding: true
-    avroStream:
-      destination: avro
-      consumer:
-        headerMode: raw
-        useNativeDecoding: true
-    intStream:
-      destination: int
-      consumer:
-        headerMode: raw
-        useNativeDecoding: true
     request:
       group: requestConsumer
       destination: request
@@ -31,18 +15,6 @@ spring.cloud.stream:
         useNativeDecoding: true
     validate:
       group: validateConsumer
-      destination: validate
-      consumer:
-        headerMode: raw
-        useNativeDecoding: true
-    requestSpecific:
-      group: requestSpecificConsumer
-      destination: request
-      consumer:
-        headerMode: raw
-        useNativeDecoding: true
-    validateSpecific:
-      group: validateSpecificConsumer
       destination: validate
       consumer:
         headerMode: raw
@@ -57,33 +29,7 @@ spring.cloud.stream:
             key:
               serde: org.apache.kafka.common.serialization.Serdes$StringSerde
             value:
-              serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-      bindings:
-        intStream:
-          consumer.valueSerde: org.apache.kafka.common.serialization.Serdes$IntegerSerde
-        avroStream:
-          consumer:
-            valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
-            useNativeEncoding: true
-          producer:
-            valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
-            useNativeEncoding: true
-        request:
-          consumer:
-            valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
-            useNativeEncoding: true
-        validate:
-          consumer:
-            valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
-            useNativeEncoding: true
-        requestSpecific:
-          consumer:
-            valueSerde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
-            useNativeEncoding: true
-        validateSpecific:
-          consumer:
-            valueSerde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
-            useNativeEncoding: true
+              serde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 
 
 server:
