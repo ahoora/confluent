@@ -1,0 +1,6 @@
+{
+  "namespace": "prozess.model",
+  "type": "enum",
+  "name": "ValidationResult",
+  "symbols": ["OK", "ERROR"]
+}

@@ -1,5 +1,5 @@
 {
-  "namespace": "prozess",
+  "namespace": "prozess.model",
   "type": "record",
   "name": "RequestedEntity",
   "fields": [

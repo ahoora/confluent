@@ -1,0 +1,9 @@
+{
+  "namespace": "prozess.model",
+  "type": "record",
+  "name": "ValidatedEntity",
+  "fields": [
+    {"name": "request", "type": "RequestedEntity"},
+    {"name": "validationResult", "type": "ValidationResult"}
+  ]
+}

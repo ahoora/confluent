@@ -1,4 +1,4 @@
-package prozess.collaboration;
+package prozess.collaboration.generic;
 
 import io.confluent.kafka.streams.serdes.avro.GenericAvroSerde;
 import org.apache.avro.Schema;
@@ -31,7 +31,7 @@ public class ValidationComponent {
     public void process(@Input("request") KStream<String, GenericRecord> requests) {
         requests.mapValues(this::validatedEntity)
                 .mapValues(this::validate)
-                .peek((k, v) -> logger.info("validated: " + k + " " + v))
+                .peek((k, v) -> logger.info("validated (g): " + k + " " + v))
                 .to("validate", Produced.valueSerde(avroSerde));
     }
 

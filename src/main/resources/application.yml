@@ -35,6 +35,18 @@ spring.cloud.stream:
       consumer:
         headerMode: raw
         useNativeDecoding: true
+    requestSpecific:
+      group: requestSpecificConsumer
+      destination: request
+      consumer:
+        headerMode: raw
+        useNativeDecoding: true
+    validateSpecific:
+      group: validateSpecificConsumer
+      destination: validate
+      consumer:
+        headerMode: raw
+        useNativeDecoding: true
   kafka:
     streams:
       binder:
@@ -64,8 +76,13 @@ spring.cloud.stream:
           consumer:
             valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
             useNativeEncoding: true
-          producer:
-            valueSerde: io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
+        requestSpecific:
+          consumer:
+            valueSerde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
+            useNativeEncoding: true
+        validateSpecific:
+          consumer:
+            valueSerde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
             useNativeEncoding: true
 
 

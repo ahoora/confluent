@@ -1,4 +1,4 @@
-package prozess.collaboration;
+package prozess.collaboration.generic;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import prozess.collaboration.CreateEntityRequest;
 import prozess.messaging.MessengerConfig;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
@@ -28,7 +29,7 @@ import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/collab")
+@RequestMapping("/collab/generic")
 @EnableBinding(StreamBindings.class)
 @Import(MessengerConfig.class)
 public class CollaborationController {
@@ -53,7 +54,7 @@ public class CollaborationController {
         completedRequests = emitter.publish().autoConnect();
 
         validations.peek((k, v) -> {
-            logger.info("completed: " + k + " " + v);
+            logger.info("completed (g): " + k + " " + v);
             sink.next(KeyValue.pair(UUID.fromString(k), v));
         });
     }

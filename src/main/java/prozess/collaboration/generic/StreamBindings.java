@@ -1,4 +1,4 @@
-package prozess.collaboration;
+package prozess.collaboration.generic;
 
 import org.apache.kafka.streams.kstream.KStream;
 import org.springframework.cloud.stream.annotation.Input;
